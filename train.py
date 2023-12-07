@@ -155,7 +155,6 @@ if __name__ == "__main__":
 
         torch.save({'model_state_dict':net.state_dict(),
                     'optimizer_state_dict':optimizer.state_dict(),
-                    'scheduler_state_dict':scheduler.state_dict(),
                     'epoch': epoch}, checkpoint_path)
 
         save_model(net, optimizer, epoch ,work_dir, distributed)
