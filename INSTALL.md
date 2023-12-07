@@ -18,9 +18,15 @@
 
     ```Shell
     # If you dont have pytorch
-    conda install pytorch torchvision cudatoolkit=10.1 -c pytorch 
+    conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
 
     pip install -r requirements.txt
+    ```
+
+    Using venv instead of conda above
+    ```bash
+    pip3 install torch torchvision -f https://download.pytorch.org/whl/cu101/torch_stable.html
+    pip3 install -r requirements.txt
     ```
 
 4. Data preparation
