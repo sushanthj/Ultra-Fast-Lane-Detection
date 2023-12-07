@@ -37,7 +37,7 @@ finetune = "/home/mrsd_teamh/sush/11-785/Ultra-Fast-Lane-Detection/checkpoints/c
 resume = None
 
 # TEST
-test_model = None
+test_model = "/home/mrsd_teamh/sush/11-785/Ultra-Fast-Lane-Detection/checkpoints/checkpoint.pth"
 test_work_dir = None
 
 num_lanes = 4
