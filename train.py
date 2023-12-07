@@ -146,9 +146,17 @@ if __name__ == "__main__":
     logger = get_logger(work_dir, cfg)
     cp_projects(args.auto_backup, work_dir)
 
+    # save model manually
+    checkpoint_path = "/home/mrsd_teamh/sush/11-785/Ultra-Fast-Lane-Detection/checkpoints/checkpoint.pth"
+
     for epoch in range(resume_epoch, cfg.epoch):
 
         train(net, train_loader, loss_dict, optimizer, scheduler,logger, epoch, metric_dict, cfg.use_aux)
-        
+
+        torch.save({'model_state_dict':net.state_dict(),
+                    'optimizer_state_dict':optimizer.state_dict(),
+                    'scheduler_state_dict':scheduler.state_dict(),
+                    'epoch': epoch}, checkpoint_path)
+
         save_model(net, optimizer, epoch ,work_dir, distributed)
     logger.close()
