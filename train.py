@@ -86,7 +86,6 @@ def train(net, data_loader, loss_dict, optimizer, scheduler,logger, epoch, metri
                                     net_time = '%.3f' % float(t_net_1 - t_net_0), 
                                     **kwargs)
         t_data_0 = time.time()
-        
 
 
 
@@ -153,9 +152,9 @@ if __name__ == "__main__":
 
         train(net, train_loader, loss_dict, optimizer, scheduler,logger, epoch, metric_dict, cfg.use_aux)
 
-        torch.save({'model_state_dict':net.state_dict(),
-                    'optimizer_state_dict':optimizer.state_dict(),
-                    'epoch': epoch}, checkpoint_path)
+        model_state_dict = net.state_dict()
+        state = {'model': model_state_dict, 'optimizer': optimizer.state_dict()}
+        torch.save(state, checkpoint_path)
 
         save_model(net, optimizer, epoch ,work_dir, distributed)
     logger.close()
