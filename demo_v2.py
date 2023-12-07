@@ -51,7 +51,7 @@ if __name__ == "__main__":
     if cfg.dataset == 'CULane':
         splits = ['test0_normal.txt']
         datasets = [LaneTestDataset(cfg.data_root,os.path.join(cfg.data_root, 'list/test_split/'+split),img_transform = img_transforms) for split in splits]
-        img_w, img_h = 1640, 590
+        img_w, img_h = 1384, 1032 # NOTE: customizing for our dataset
         row_anchor = culane_row_anchor
     elif cfg.dataset == 'Tusimple':
         splits = ['test.txt']
