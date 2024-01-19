@@ -1,35 +1,28 @@
 # Ultra-Fast-Lane-Detection
 PyTorch implementation of the paper "[Ultra Fast Structure-aware Deep Lane Detection](https://arxiv.org/abs/2004.11757)".
 
-**\[July 18, 2022\] Updates: The new version of our method has been accepted by TPAMI 2022. Code is available [here](https://github.com/cfzd/Ultra-Fast-Lane-Detection-v2)**.
-
-\[June 28, 2021\] Updates: we will release an extended version, which improves **6.3** points of F1 on CULane with the ResNet-18 backbone compared with the ECCV version.
-
-Updates: Our paper has been accepted by ECCV2020.
+**\[July 18, 2022\] Updates: The new version of our method is available [here](https://github.com/cfzd/Ultra-Fast-Lane-Detection-v2)** --> **NOTE: The Dataloader uses different information for the CULane dataset than this implementation**
 
 ![alt text](vis.jpg "vis")
 
-The evaluation code is modified from [SCNN](https://github.com/XingangPan/SCNN) and [Tusimple Benchmark](https://github.com/TuSimple/tusimple-benchmark).
-
-Caffe model and prototxt can be found [here](https://github.com/Jade999/caffe_lane_detection).
-
-# Demo 
+# On-Road Lane Detection Demo
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=lnFbAG3GBN4
-" target="_blank"><img src="http://img.youtube.com/vi/lnFbAG3GBN4/0.jpg" 
+" target="_blank"><img src="http://img.youtube.com/vi/lnFbAG3GBN4/0.jpg"
 alt="Demo" width="240" height="180" border="10" /></a>
 
+# Crop Row Detection Output
 
-# Install
+![](result_1.png)
+![](result_2.png)
+
+# Install and Setup
 Please see [INSTALL.md](./INSTALL.md)
 
 # Get started
-First of all, please modify `data_root` and `log_path` in your `configs/culane.py` or `configs/tusimple.py` config according to your environment. 
-- `data_root` is the path of your CULane dataset or Tusimple dataset. 
+First of all, please modify `data_root` and `log_path` in your `configs/culane.py` or `configs/tusimple.py` config according to your environment.
+- `data_root` is the path of your CULane dataset or Tusimple dataset.
 - `log_path` is where tensorboard logs, trained models and code backup are stored. ***It should be placed outside of this project.***
 
-
-
-***
 
 For single gpu training, run
 ```Shell
@@ -70,23 +63,12 @@ We provide two trained Res-18 models on CULane and Tusimple.
 | Tusimple |     95.87    |       95.82      |         306         | [GoogleDrive](https://drive.google.com/file/d/1WCYyur5ZaWczH15ecmeDowrW30xcLrCn/view?usp=sharing)/[BaiduDrive(code:bghd)](https://pan.baidu.com/s/1Fjm5yVq1JDpGjh4bdgdDLA) |
 |  CULane  |     68.4     |       69.7       |         324         | [GoogleDrive](https://drive.google.com/file/d/1zXBRTw50WOzvUp6XKsi8Zrk3MUC3uFuq/view?usp=sharing)/[BaiduDrive(code:w9tw)](https://pan.baidu.com/s/19Ig0TrV8MfmFTyCvbSa4ag) |
 
-For evaluation, run
-```Shell
-mkdir tmp
-# This a bad example, you should put the temp files outside the project.
 
-python test.py configs/culane.py --test_model path_to_culane_18.pth --test_work_dir ./tmp
-
-python test.py configs/tusimple.py --test_model path_to_tusimple_18.pth --test_work_dir ./tmp
-```
-
-Same as training, multi-gpu evaluation is also supported.
-
-# Visualization
+# Visualization / Inference
 
 We provide a script to visualize the detection results. Run the following commands to visualize on the testing set of CULane and Tusimple.
 ```Shell
-python demo.py configs/culane.py --test_model path_to_culane_18.pth
+python demo_v2.py configs/young_soybean_1.py --test_model path_to_culane_18.pth
 # or
 python demo.py configs/tusimple.py --test_model path_to_tusimple_18.pth
 ```
@@ -103,28 +85,4 @@ python speed_real.py
 # this will test the speed with real video or camera input
 ```
 It will loop 100 times and calculate the average runtime and fps in your environment.
-
-# Citation
-
-```BibTeX
-@InProceedings{qin2020ultra,
-author = {Qin, Zequn and Wang, Huanyu and Li, Xi},
-title = {Ultra Fast Structure-aware Deep Lane Detection},
-booktitle = {The European Conference on Computer Vision (ECCV)},
-year = {2020}
-}
-
-@ARTICLE{qin2022ultrav2,
-  author={Qin, Zequn and Zhang, Pengyi and Li, Xi},
-  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
-  title={Ultra Fast Deep Lane Detection With Hybrid Anchor Driven Ordinal Classification}, 
-  year={2022},
-  volume={},
-  number={},
-  pages={1-14},
-  doi={10.1109/TPAMI.2022.3182097}
-}
 ```
-
-# Thanks
-Thanks zchrissirhcz for the contribution to the compile tool of CULane, KopiSoftware for contributing to the speed test, and ustclbh for testing on the Windows platform.

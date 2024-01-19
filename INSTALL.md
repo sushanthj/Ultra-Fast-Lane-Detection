@@ -7,96 +7,107 @@
     cd Ultra-Fast-Lane-Detection
     ```
 
-2. Create a conda virtual environment and activate it
+2. Install dependencies
 
-    ```Shell
-    conda create -n lane-det python=3.7 -y
-    conda activate lane-det
+    - Inside a new venv environment
+      ```bash
+      pip3 install torch torchvision -f https://download.pytorch.org/whl/cu101/torch_stable.html
+      pip3 install -r requirements.txt
+      ```
+    - Optionally install a few more requirements if there are some mising packages (recommended)
+      ```bash
+      pip3 install -r extended_requirements.txt
+      ```
+
+3. Data preparation for Custom Dataset
+
+    - To understand how we can build the custom dataset to match CULane we first need to
+    understand how CULane's format (Link to CULane : https://xingangpan.github.io/projects/CULane.html)
+    - CULane has RGB images and binary mask images for training (see binary mask example below)
+      ![](mask.png)
+    - The dataloader for this model requires only the filepaths of the above images. To get
+      these filepaths, the network looks for a train_gt.txt (train set) and test.txt (validation set)
+    - This train_gt.txt and test.txt must located in a folder called **'list'** and the filepath
+      of this 'list' folder must be added to the configs/young_soybean.py file as shown below
+      ```python
+        # The folder project_train_data_1 contains the 'list' folder as well as the training
+        # validation, and testing images
+        dataset='CULane'
+        data_root = '/home/mrsd_teamh/sush/11-785/project_train_data_1'
+
+
+        # TRAIN (Do not change, also SGD works better for this model)
+        epoch = 50
+        batch_size = 32
+        optimizer = 'SGD'  #['SGD','Adam']
+        learning_rate = 0.1
+        weight_decay = 1e-4
+        momentum = 0.9
+      ```
+    - For inference of images, we need to also specify image paths. However, these paths
+      must be present in a folder called 'test_split' inside the 'list' folder
+    - test_split folder will internally have test0_normal.txt, test1_normal.txt ..etc. which
+      will contain the filepaths to inference images
+    - Another folder called test_output will need to be present in the 'data_root' as per the tree shown below
+
+    Here's a simple illustration of the desired structure of the 'list' folder
+
+    ```
+    project_train_data_1/
+    ├── list
+    │   ├── test.txt
+    │   ├── test_split
+    │   │   └── test0_normal.txt
+    │   └── train_gt.txt
+    |
+    ├── training_images
+    │   ├── images-clean
+    │   │   ├── frame_0000.png
+    │   │   └── frame_1140.png
+    |   |
+    │   └── masks-clean
+    │       ├── frame_0000_mask.png
+    │       └── frame_1140_mask.png
+    |
+    └── test_output (images after inference and drawing lanes will be saved here)
+        ├── 0.png
+        └── 9.png
     ```
 
-3. Install dependencies
+4. Using Pre-Trained Model for Finetuning
 
-    ```Shell
-    # If you dont have pytorch
-    conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
+    - The config file can be modified to use a model already pre-trained on the CULane
+      dataset. Please download the necessary pre-trained model from : https://drive.google.com/file/d/1zXBRTw50WOzvUp6XKsi8Zrk3MUC3uFuq/view?usp=sharing
+    - After downloading the model, update the 'Fine Tune' path in config as shown below
+    - I used the 18 layer backbone as it is the lightest. I also had low training data
+      and therefore could not finetune a larger model
 
-    pip install -r requirements.txt
-    ```
+    NOTE: We also need to create a folder to log all training (training will fail if not)
 
-    Using venv instead of conda above
-    ```bash
-    pip3 install torch torchvision -f https://download.pytorch.org/whl/cu101/torch_stable.html
-    pip3 install -r requirements.txt
-    ```
+    ```python
+    # NETWORK
+    use_aux = True
+    griding_num = 200
+    backbone = '18'
 
-4. Data preparation
+    # LOSS
+    sim_loss_w = 0.0
+    shp_loss_w = 0.0
 
-    Download [CULane](https://xingangpan.github.io/projects/CULane.html) and [Tusimple](https://github.com/TuSimple/tusimple-benchmark/issues/3). Then extract them to `$CULANEROOT` and `$TUSIMPLEROOT`. The directory arrangement of Tusimple should look like:
-    ```
-    $TUSIMPLEROOT
-    |──clips
-    |──label_data_0313.json
-    |──label_data_0531.json
-    |──label_data_0601.json
-    |──test_tasks_0627.json
-    |──test_label.json
-    |──readme.md
-    ```
-    The directory arrangement of CULane should look like:
-    ```
-    $CULANEROOT
-    |──driver_100_30frame
-    |──driver_161_90frame
-    |──driver_182_30frame
-    |──driver_193_90frame
-    |──driver_23_30frame
-    |──driver_37_30frame
-    |──laneseg_label_w16
-    |──list
-    ```
-    
-    For Tusimple, the segmentation annotation is not provided, hence we need to generate segmentation from the json annotation. 
+    # EXP
+    note = ''
 
-    ```Shell
-    python scripts/convert_tusimple.py --root $TUSIMPLEROOT
-    # this will generate segmentations and two list files: train_gt.txt and test.txt
-    ```
+    # This folder must be created by user
+    log_path = "/home/mrsd_teamh/sush/11-785/ufld_logging"
 
-5. Install CULane evaluation tools (Only required for testing). 
+    # FINETUNE or RESUME MODEL PATH
+    # finetune = None
+    finetune = "/home/mrsd_teamh/sush/11-785/Ultra-Fast-Lane-Detection/checkpoints/culane_18.pth"
+    resume = None
 
-    If you just want to train a model or make a demo, this tool is not necessary and you can skip this step. If you want to get the evaluation results on CULane, you should install this tool.
+    # TEST
+    test_model = "/home/mrsd_teamh/sush/11-785/Ultra-Fast-Lane-Detection/checkpoints/checkpoint.pth"
+    test_work_dir = None
 
-    This tools requires OpenCV C++. Please follow [here](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html) to install OpenCV C++. ***When you build OpenCV, remove the paths of anaconda from PATH or it will be failed.***
-    ```Shell
-    # First you need to install OpenCV C++. 
-    # After installation, make a soft link of OpenCV include path.
-
-    ln -s /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
-    ```
-    We provide three kinds of complie pipelines to build the evaluation tool of CULane.
-
-    Option 1:
-
-    ```Shell
-    cd evaluation/culane
-    make
-    ```
-
-    Option 2:
-    ```Shell
-    cd evaluation/culane
-    mkdir build && cd build
-    cmake ..
-    make
-    mv culane_evaluator ../evaluate
-    ```
-
-    For Windows user:
-    ```Shell
-    mkdir build-vs2017
-    cd build-vs2017
-    cmake .. -G "Visual Studio 15 2017 Win64"
-    cmake --build . --config Release  
-    # or, open the "xxx.sln" file by Visual Studio and click build button
-    move culane_evaluator ../evaluate
+    num_lanes = 4
     ```
