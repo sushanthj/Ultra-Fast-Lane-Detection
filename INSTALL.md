@@ -19,7 +19,17 @@
       pip3 install -r extended_requirements.txt
       ```
 
-3. Data preparation for Custom Dataset
+3. Dataset Preperation
+
+    To generate the dataset, use the SALT annotation tool and annotate after switching modes
+    to the line annotation mode.
+
+    The annotation tool can be found at : https://github.com/sushanthj/salt
+
+    After saving the annotations.json file, please use the convert_coco_ann_to_ufld.py script
+    to save the mask images for training.
+
+4. DataLoading for Custom Dataset
 
     - To understand how we can build the custom dataset to match CULane we first need to
     understand how CULane's format (Link to CULane : https://xingangpan.github.io/projects/CULane.html)
